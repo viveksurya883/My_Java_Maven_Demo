@@ -83,13 +83,13 @@ jobs:
       - name: Configure JFrog CLI
         run: |
           jf c add my-artifactory \
-            --url="${{ secrets.ARTIFACTORY_URL }}" \
+            --url=https://trialz1c1tf.jfrog.io \
             --user="${{ secrets.ARTIFACTORY_USER }}" \
             --password="${{ secrets.ARTIFACTORY_PASSWORD }}" \
             --interactive=false
 
-      - name: Upload artifact (jar) to Artifactory
+      - name: Upload artifact (jar file) to Artifactory
         run: |
           ls -la target
-          jf rt upload "target/*.jar" "${{ secrets.ARTIFACTORY_REPO }}/my_java_maven_demo/${{ github.run_number }}/" --flat=true --server-id=my-artifactory
+          jf rt upload "target/*.jar" "generic-local/my_java_maven_demo/${{ github.run_number }}/" --flat=true --server-id=my-artifactory
 
