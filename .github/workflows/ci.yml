@@ -55,11 +55,13 @@ jobs:
         run: mvn -B -DskipTests=false clean verify
 
       - name: SonarQube Analysis
-        run: mvn sonar:sonar \
-         -Dsonar.projectKey=viveksurya883_My_Java_Maven_Demo \
-         -Dsonar.organization=viveksurya883 \
-         -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
-         -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+        run: |
+          mvn verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+          -Dsonar.projectKey=viveksurya883_My_Java_Maven_Demo \
+          -Dsonar.organization=viveksurya883 \
+          -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
+          -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
