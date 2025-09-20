@@ -89,7 +89,7 @@ jobs:
             --interactive=false
 
 
-      - name: Upload artifact (jar) to Artifactory
+      - name: Upload artifact (jar file) to Artifactory
         run: |
           ls -la target
           jf rt upload "target/*.jar" "${{ secrets.ARTIFACTORY_REPO }}/my_java_maven_demo/${{ github.run_number }}/" --flat=true
