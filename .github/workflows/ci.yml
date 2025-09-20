@@ -81,13 +81,12 @@ jobs:
           version: latest
 
       - name: Configure JFrog CLI
-        run: jf c add my-artifactory \
-          --url=${{ secrets.ARTIFACTORY_URL }} \
-          --user=${{ secrets.ARTIFACTORY_USER }} \
-          --password=${{ secrets.ARTIFACTORY_PASSWORD }} \
-          --interactive=false
-
-
+        run: |
+          jf c add my-artifactory \
+            --url="${{ secrets.ARTIFACTORY_URL }}" \
+            --user="${{ secrets.ARTIFACTORY_USER }}" \
+            --password="${{ secrets.ARTIFACTORY_PASSWORD }}" \
+            --interactive=false
 
       - name: Upload artifact (jar file) to Artifactory
         run: |
