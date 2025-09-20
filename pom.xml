@@ -23,7 +23,7 @@
     <java.version>17</java.version>
     <spring.boot.version>3.2.0</spring.boot.version>
     <!-- sonar key (optional: override via CLI) -->
-    <sonar.projectKey>my-java-frontend</sonar.projectKey>
+    <sonar.projectKey>My_Java_Maven_Demo</sonar.projectKey>
   </properties>
 
   <dependencies>
