@@ -54,7 +54,7 @@ jobs:
       - name: Build & test (Maven)
         run: mvn -B -DskipTests=false clean verify
 
-      - name: SonarQube Analysis
+      - name: SonarQube Analysis without automatic analysis
         run: |
           mvn verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
           -Dsonar.projectKey=viveksurya883_My_Java_Maven_Demo \
