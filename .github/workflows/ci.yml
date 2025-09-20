@@ -70,10 +70,10 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build Docker image
-        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/my_java_maven_demo:latest .
+        run: docker build -t docker.io/${{ secrets.DOCKER_USERNAME }}/my_java_maven_demo:latest .
 
       - name: Push Docker image
-        run: docker push ${{ secrets.DOCKER_USERNAME }}/my_java_maven_demo:latest
+        run: docker push docker.io/${{ secrets.DOCKER_USERNAME }}/my_java_maven_demo:latest
 
       - name: Install JFrog CLI
         uses: jfrog/setup-jfrog-cli@v2
