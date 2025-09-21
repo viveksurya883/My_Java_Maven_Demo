@@ -156,7 +156,7 @@ jobs:
          --interactive=false
 
       - name: Upload artifact (JAR)
-        run: jf rt upload "target/*.jar" "libs-snapshot-local/my_java_maven_demo/1.0.${{ github.run_number }}/" --flat=true --server-id=my-artifactory
+        run: jf rt upload "target/*.jar" "maven-local/my_java_maven_demo/${{ github.run_number }}-${{ github.sha }}/" --flat=true --server-id=my-artifactory
 
 
 
