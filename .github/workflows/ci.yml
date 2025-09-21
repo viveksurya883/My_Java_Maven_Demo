@@ -10,10 +10,11 @@ env:
   IMAGE_NAME: My_Java_Maven_Demo
 
 jobs:
-  build:
+  # -------------------- INIT --------------------
+  init:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout Code
         uses: actions/checkout@v4
 
       - name: Set up JDK 17 and cache Maven
@@ -51,10 +52,31 @@ jobs:
           </settings>
           EOF
 
-      - name: Build & test (Maven)
-        run: mvn -B -DskipTests=false clean verify
+  # -------------------- BUILD --------------------
+  build:
+    runs-on: ubuntu-latest
+    needs: init
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build (Maven)
+        run: mvn -B clean compile
 
-      - name: SonarQube Analysis without automatic analysis
+  # -------------------- TEST --------------------
+  test:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Unit Tests
+        run: mvn -B test
+
+  # -------------------- ANALYZE (SonarQube) --------------------
+  analyze:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+      - name: SonarQube Analysis
         run: |
           mvn verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
           -Dsonar.projectKey=viveksurya883_My_Java_Maven_Demo \
@@ -62,7 +84,23 @@ jobs:
           -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
           -Dsonar.login=${{ secrets.SONAR_TOKEN }}
 
+  # -------------------- PACKAGE --------------------
+  package:
+    runs-on: ubuntu-latest
+    needs: analyze
+    steps:
+      - uses: actions/checkout@v4
+      - name: Package JAR
+        run: mvn -B package -DskipTests=false
+      - name: List target dir
+        run: ls -la target
 
+  # -------------------- DOCKER --------------------
+  docker:
+    runs-on: ubuntu-latest
+    needs: package
+    steps:
+      - uses: actions/checkout@v4
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
         with:
@@ -75,6 +113,12 @@ jobs:
       - name: Push Docker image
         run: docker push docker.io/${{ secrets.DOCKER_USERNAME }}/my_java_maven_demo:latest
 
+  # -------------------- ARTIFACTORY --------------------
+  publish-artifact:
+    runs-on: ubuntu-latest
+    needs: package
+    steps:
+      - uses: actions/checkout@v4
       - name: Install JFrog CLI
         uses: jfrog/setup-jfrog-cli@v2
         with:
@@ -92,4 +136,3 @@ jobs:
         run: |
           ls -la target
           jf rt upload "target/*.jar" "generic-local/my_java_maven_demo/${{ github.run_number }}/" --flat=true --server-id=my-artifactory
-

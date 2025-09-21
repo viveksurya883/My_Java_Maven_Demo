@@ -1,12 +1,76 @@
 <!doctype html>
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <title>CI Demo - Java Frontend</title>
-  </head>
-  <body>
-    <h1>My Java Frontend — CI Demo</h1>
-    <p>Build/test/sonar/docker/artifactory demo.</p>
-    <p>This is Vivek this side working with Cognizant Technology Solutions on this project!</p>
-  </body>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CI Demo - Java Frontend</title>
+  <style>
+    /* Reset some defaults */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #6a11cb, #2575fc);
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 20px;
+    }
+
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 20px;
+      text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+    }
+
+    p {
+      font-size: 1.2rem;
+      margin-bottom: 15px;
+      max-width: 600px;
+    }
+
+    .button {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 15px 30px;
+      font-size: 1rem;
+      font-weight: bold;
+      color: #2575fc;
+      background-color: #fff;
+      border-radius: 50px;
+      text-decoration: none;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      transition: all 0.3s ease;
+    }
+
+    .button:hover {
+      background-color: #e0e0e0;
+      transform: translateY(-3px);
+    }
+
+    footer {
+      margin-top: 40px;
+      font-size: 0.9rem;
+      opacity: 0.8;
+    }
+  </style>
+</head>
+<body>
+  <h1>CI Demo — Java Frontend</h1>
+  <p>Welcome! This is a simple demo landing page showcasing the CI/CD workflow.</p>
+  <p>Built by <strong>Vivek</strong>, working at Cognizant Technology Solutions on this project.</p>
+  <a href="#demo" class="button">Explore Demo</a>
+
+  <footer>
+    &copy; 2025 Vivek | CI/CD Demo Project
+  </footer>
+</body>
 </html>
