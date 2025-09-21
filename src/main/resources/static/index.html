@@ -5,14 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CI Demo - Java Frontend</title>
   <style>
-    /* Reset some defaults */
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
-
     body {
       background: linear-gradient(135deg, #6a11cb, #2575fc);
       color: #fff;
@@ -24,19 +22,41 @@
       text-align: center;
       padding: 20px;
     }
-
+    .container {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      gap: 40px;
+      margin-top: 40px;
+      flex-wrap: wrap;
+      width: 100%;
+      max-width: 1100px;
+    }
+    .left {
+      flex: 1 1 320px;
+      min-width: 300px;
+      max-width: 500px;
+      text-align: left;
+    }
+    .right {
+      flex: 1 1 320px;
+      min-width: 300px;
+      max-width: 500px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+    }
     h1 {
       font-size: 3rem;
       margin-bottom: 20px;
       text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
     }
-
     p {
       font-size: 1.2rem;
       margin-bottom: 15px;
       max-width: 600px;
     }
-
     .button {
       display: inline-block;
       margin-top: 20px;
@@ -50,12 +70,16 @@
       box-shadow: 0 4px 10px rgba(0,0,0,0.3);
       transition: all 0.3s ease;
     }
-
     .button:hover {
       background-color: #e0e0e0;
       transform: translateY(-3px);
     }
-
+    .desc-below-img {
+      margin-top: 20px;
+      color: #fff;
+      text-align: center;
+      font-size: 1.1rem;
+    }
     footer {
       margin-top: 40px;
       font-size: 0.9rem;
@@ -64,11 +88,20 @@
   </style>
 </head>
 <body>
-  <h1>CI Demo — Java Frontend</h1>
-  <p>Welcome! This is a simple demo landing page showcasing the CI/CD workflow.</p>
-  <p>Built by <strong>Vivek</strong>, working at Cognizant Technology Solutions on this project.</p>
-  <a href="#demo" class="button">Explore Demo</a>
-
+  <div class="container">
+    <div class="left">
+      <h1>CI/CD Pipeline Demo — Java Maven</h1>
+      <p>Welcome! This is a simple demo landing page showcasing the CI/CD workflow.</p>
+      <p>Built by <strong>Vivek</strong>, working at Cognizant Technology Solutions on this personal project.</p>
+      <a href="#demo" class="button">Explore Demo</a>
+    </div>
+    <div class="right">
+      <img src="/github_actions.jpg_large" alt="GitHub Actions" style="max-width:100%; border-radius:16px; box-shadow:0 4px 16px rgba(0,0,0,0.2);">
+      <p class="desc-below-img">
+        The tools mentioned in the image are being used in this project from the build stage using Maven to code quality testing using SonarQube to image creation using Docker to artifact storage in JFrog as per CI pipeline!
+      </p>
+    </div>
+  </div>
   <footer>
     &copy; 2025 Vivek | CI/CD Demo Project
   </footer>

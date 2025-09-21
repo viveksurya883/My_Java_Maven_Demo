@@ -98,6 +98,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
       - name: Download JAR artifact
         uses: actions/download-artifact@v4
         with:
@@ -112,11 +118,10 @@ jobs:
       - name: Configure JFrog CLI
         run: |
           jf c add my-artifactory \
-            --url=https://trialz1c1tf.jfrog.io \
-            --user="${{ secrets.ARTIFACTORY_USER }}" \
-            --password="${{ secrets.ARTIFACTORY_PASSWORD }}" \
-            --interactive=false
+          --url=https://trialz1c1tf.jfrog.io \
+          --user="${{ secrets.ARTIFACTORY_USER }}" \
+          --password="${{ secrets.ARTIFACTORY_PASSWORD }}" \
+          --interactive=false
 
-      - name: Upload artifact (JAR) to Artifactory
-        run: |
-          jf rt upload "target/*.jar" "generic-local/my_java_maven_demo/${{ github.run_number }}-${{ github.sha }}/" --flat=true --server-id=my-artifactory
+      - name: Deploy to Artifactory (maven-local)
+        run: mvn -B deploy -DskipTests=false

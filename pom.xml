@@ -4,19 +4,20 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
          http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
+
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
     <version>3.2.0</version>
     <relativePath/> <!-- lookup parent from repository -->
-    </parent>
+  </parent>
 
   <groupId>com.example</groupId>
-  <artifactId>my-java-frontend</artifactId>
+  <artifactId>my_java_maven_demo</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <packaging>jar</packaging>
 
-  <name>my-java-frontend</name>
+  <name>my_java_maven_demo</name>
   <description>Minimal Java frontend demo for CI</description>
 
   <properties>
@@ -84,4 +85,17 @@
       </plugin>
     </plugins>
   </build>
+
+  <!-- Where to publish artifacts -->
+  <distributionManagement>
+    <repository>
+      <id>artifactory-repo</id>
+      <url>https://trialz1c1tf.jfrog.io/artifactory/maven-local</url>
+    </repository>
+    <snapshotRepository>
+      <id>artifactory-repo</id>
+      <url>https://trialz1c1tf.jfrog.io/artifactory/maven-local</url>
+    </snapshotRepository>
+  </distributionManagement>
+
 </project>
