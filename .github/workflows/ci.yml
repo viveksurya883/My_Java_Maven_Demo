@@ -113,15 +113,16 @@ jobs:
       - name: Install JFrog CLI
         uses: jfrog/setup-jfrog-cli@v2
         with:
-          version: latest
+         version: latest
 
       - name: Configure JFrog CLI
         run: |
-          jf c add my-artifactory \
-          --url=https://trialz1c1tf.jfrog.io \
-          --user="${{ secrets.ARTIFACTORY_USER }}" \
-          --password="${{ secrets.ARTIFACTORY_PASSWORD }}" \
-          --interactive=false
+         jf c add my-artifactory \
+         --url=https://trialz1c1tf.jfrog.io \
+         --user="${{ secrets.ARTIFACTORY_USER }}" \
+         --password="${{ secrets.ARTIFACTORY_PASSWORD }}" \
+         --interactive=false
 
-      - name: Deploy to Artifactory (maven-local)
-        run: mvn -B deploy -DskipTests=false
+      - name: Upload artifact (JAR)
+        run: jf rt upload "target/*.jar" "maven-local/my_java_maven_demo/${{ github.run_number }}-${{ github.sha }}/" --flat=true --server-id=my-artifactory
+
