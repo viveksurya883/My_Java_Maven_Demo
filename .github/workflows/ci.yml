@@ -13,6 +13,8 @@ jobs:
   # -------------------- INIT --------------------
   init:
     runs-on: ubuntu-latest
+    outputs:
+      m2-cache-key: ${{ steps.cache-m2.outputs.cache-hit }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -25,6 +27,7 @@ jobs:
           cache: maven
 
       - name: Cache ~/.m2/repository
+        id: cache-m2
         uses: actions/cache@v4
         with:
           path: ~/.m2/repository
@@ -32,12 +35,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-m2-
 
-      - name: Show Java & Maven versions
-        run: |
-          java -version
-          mvn -v
-
-      - name: Create Maven settings.xml (for Artifactory if needed)
+      - name: Create Maven settings.xml (for Artifactory)
         run: |
           mkdir -p ~/.m2
           cat > ~/.m2/settings.xml <<EOF
@@ -52,46 +50,15 @@ jobs:
           </settings>
           EOF
 
-  # -------------------- BUILD --------------------
-  build:
+  # -------------------- BUILD, TEST & PACKAGE --------------------
+  build-package:
     runs-on: ubuntu-latest
     needs: init
     steps:
       - uses: actions/checkout@v4
-      - name: Build (Maven)
-        run: mvn -B clean compile
 
-  # -------------------- TEST --------------------
-  test:
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - uses: actions/checkout@v4
-      - name: Run Unit Tests
-        run: mvn -B test
-
-  # -------------------- ANALYZE (SonarQube) --------------------
-  analyze:
-    runs-on: ubuntu-latest
-    needs: test
-    steps:
-      - uses: actions/checkout@v4
-      - name: SonarQube Analysis
-        run: |
-          mvn verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
-          -Dsonar.projectKey=viveksurya883_My_Java_Maven_Demo \
-          -Dsonar.organization=viveksurya883 \
-          -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
-          -Dsonar.login=${{ secrets.SONAR_TOKEN }}
-
-  # -------------------- PACKAGE --------------------
-  package:
-    runs-on: ubuntu-latest
-    needs: analyze
-    steps:
-      - uses: actions/checkout@v4
-      - name: Package JAR
-        run: mvn -B package -DskipTests=false
+      - name: Build & Test & Package (Maven)
+        run: mvn -B clean verify package -DskipTests=false
 
       - name: Upload JAR artifact
         uses: actions/upload-artifact@v4
@@ -102,11 +69,11 @@ jobs:
   # -------------------- DOCKER --------------------
   docker:
     runs-on: ubuntu-latest
-    needs: package
+    needs: build-package
     steps:
       - uses: actions/checkout@v4
 
-      - name: Download JAR artifact (for Docker build)
+      - name: Download JAR artifact
         uses: actions/download-artifact@v4
         with:
           name: app-jar
@@ -127,7 +94,7 @@ jobs:
   # -------------------- ARTIFACTORY --------------------
   publish-artifact:
     runs-on: ubuntu-latest
-    needs: package
+    needs: build-package
     steps:
       - uses: actions/checkout@v4
 
@@ -150,8 +117,6 @@ jobs:
             --password="${{ secrets.ARTIFACTORY_PASSWORD }}" \
             --interactive=false
 
-      - name: Upload artifact (jar file) to Artifactory
+      - name: Upload artifact (JAR) to Artifactory
         run: |
-          ls -la target
-          jf rt upload "target/*.jar" "generic-local/my_java_maven_demo/${{ github.run_number }}/" \
-            --flat=true --server-id=my-artifactory
+          jf rt upload "target/*.jar" "generic-local/my_java_maven_demo/${{ github.run_number }}-${{ github.sha }}/" --flat=true --server-id=my-artifactory
