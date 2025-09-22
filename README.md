@@ -1,4 +1,4 @@
-last successful commit ci.yml
+last successful commit ci.yml: this uses github actions to upload the artifact and then downloads from the docker for image creation.
 
 name: CI
 
