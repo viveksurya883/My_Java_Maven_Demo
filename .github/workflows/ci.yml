@@ -38,16 +38,16 @@ jobs:
         run: |
           mkdir -p ~/.m2
           cat > ~/.m2/settings.xml <<EOF
-<settings>
-  <servers>
-    <server>
-      <id>artifactory-repo</id>
-      <username>${{ secrets.ARTIFACTORY_USER }}</username>
-      <password>${{ secrets.ARTIFACTORY_PASSWORD }}</password>
-    </server>
-  </servers>
-</settings>
-EOF
+       <settings>
+       <servers>
+       <server>
+        <id>artifactory-repo</id>
+        <username>${{ secrets.ARTIFACTORY_USER }}</username>
+        <password>${{ secrets.ARTIFACTORY_PASSWORD }}</password>
+       </server>
+       </servers>
+       </settings>
+       EOF
 
       - name: Build, Test, Sonar, Deploy to maven-local
         env:
