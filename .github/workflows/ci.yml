@@ -2,9 +2,10 @@ name: CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [ dummy ]
+
   pull_request:
-    branches: [ main ]
+    branches: [ dummy ]
 
 env:
   IMAGE_NAME: My_Java_Maven_Demo
