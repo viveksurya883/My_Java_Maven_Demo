@@ -14,7 +14,8 @@ spec:
     spec:
       containers:
         - name: my-java-demo
-          image: vivek883/my_java_maven_demo:latest
+          image: docker.io/vivek883/my_java_maven_demo:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 8080
 ---
