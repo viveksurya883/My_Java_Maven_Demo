@@ -6,176 +6,113 @@
   <title>CI/CD Pipeline Demo — Java Maven</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Inter', sans-serif;
-    }
-
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
     body {
       background: linear-gradient(135deg, #6a11cb, #2575fc);
-      color: #fff;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
-      align-items: center;
-      text-align: center;
-      overflow-x: hidden;
+      color: #fff; min-height: 100vh;
+      display: flex; flex-direction: column; justify-content: flex-start; align-items: center;
+      text-align: center; overflow-x: hidden;
     }
+    header { 
+        padding: 60px 20px 20px 20px; 
+        min-height: 100vh;        /* Full viewport height */
+        padding: 60px 20px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;  /* Vertically center */
+        align-items: center;      /* Horizontally center */
+        text-align: center;
+   }
 
-    header {
-      padding: 60px 20px 20px 20px;
-    }
-
+    
     header h1 {
-      font-size: 3rem;
-      font-weight: 700;
+      font-size: 3rem; font-weight: 700;
       text-shadow: 2px 2px 12px rgba(0,0,0,0.4);
       margin-bottom: 20px;
     }
-
-    header p {
-      font-size: 1.2rem;
-      max-width: 700px;
-      margin: 10px auto;
-      line-height: 1.6;
-    }
-
+    header p { font-size: 1.2rem; max-width: 750px; margin: 10px auto; line-height: 1.6; }
     .button {
-      display: inline-block;
-      margin-top: 30px;
-      padding: 15px 35px;
-      font-size: 1rem;
-      font-weight: 600;
-      color: #2575fc;
-      background-color: #fff;
-      border-radius: 50px;
-      text-decoration: none;
+      display: inline-block; margin-top: 30px; padding: 15px 35px;
+      font-size: 1rem; font-weight: 600; color: #2575fc;
+      background-color: #fff; border-radius: 50px; text-decoration: none;
       box-shadow: 0 6px 15px rgba(0,0,0,0.3);
       transition: all 0.3s ease;
     }
-
-    .button:hover {
-      background-color: #e0e0e0;
-      transform: translateY(-4px);
-    }
-
+    .button:hover { background-color: #e0e0e0; transform: translateY(-4px); }
     .container {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      align-items: flex-start;
-      gap: 50px;
-      padding: 40px 20px;
-      max-width: 1200px;
-      width: 100%;
-      transition: all 0.5s ease;
+      display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-start;
+      gap: 50px; padding: 40px 20px; max-width: 1200px; width: 100%;
     }
-
     .card {
       background: rgba(255, 255, 255, 0.1);
-      border-radius: 20px;
-      padding: 20px;
-      flex: 1 1 320px;
-      min-width: 300px;
-      max-width: 500px;
+      border-radius: 20px; padding: 20px; flex: 1 1 320px;
+      min-width: 300px; max-width: 500px;
       backdrop-filter: blur(8px);
       box-shadow: 0 8px 20px rgba(0,0,0,0.25);
       transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
-
-    .card:hover {
-      transform: translateY(-8px);
-      box-shadow: 0 12px 25px rgba(0,0,0,0.35);
-    }
-
-    .card img {
-      width: 100%;
-      border-radius: 16px;
-      margin-bottom: 15px;
-      max-height: 200px;
-    }
-
-    .card p {
-      font-size: 1.1rem;
-      line-height: 1.6;
-      text-align: left;
-    }
-
-    #demo-section {
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      width: 100%;
-      padding-bottom: 60px;
-    }
-
-    #demo-section.active {
-      display: flex;
-      animation: fadeIn 0.8s ease forwards;
-    }
-
-    footer {
-      margin-top: 40px;
-      font-size: 0.9rem;
-      opacity: 0.8;
-      text-align: center;
-      padding-bottom: 20px;
-    }
-
-    @keyframes fadeIn {
-      0% { opacity: 0; transform: translateY(20px); }
-      100% { opacity: 1; transform: translateY(0); }
-    }
-
-    @media (max-width: 768px) {
-      header h1 { font-size: 2.5rem; }
-      .button { padding: 12px 25px; }
-    }
-
+    .card:hover { transform: translateY(-8px); box-shadow: 0 12px 25px rgba(0,0,0,0.35); }
+    .card img { width: 100%; border-radius: 16px; margin-bottom: 15px; max-height: 200px; }
+    .card p { font-size: 1.05rem; line-height: 1.6; text-align: left; }
+    #demo-section { display: none; flex-direction: column; align-items: center; width: 100%; padding-bottom: 60px; }
+    #demo-section.active { display: flex; animation: fadeIn 0.8s ease forwards; }
+    footer { margin-top: 40px; font-size: 0.9rem; opacity: 0.8; text-align: center; padding-bottom: 20px; }
+    @keyframes fadeIn { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
+    @media (max-width: 768px) { header h1 { font-size: 2.5rem; } .button { padding: 12px 25px; } }
   </style>
 </head>
 <body>
 
   <header>
-    <h1>CI/CD Pipeline Demo — Java Maven with AKS Deployment</h1>
-    <p>Welcome! This demo showcases a full CI/CD workflow — from building with Maven to code quality checks with SonarQube, Docker image creation, and artifact management in JFrog.</p>
+    <h1>CI/CD Pipeline Demo - Java Maven with AKS Deployment</h1>
+    <p>
+      This project demonstrates a <strong>complete CI/CD implementation</strong> for a Java Maven application.  
+      The pipeline automates everything — from <strong>build, test, code quality, artifact management, 
+      Dockerization, and deployment to Azure Kubernetes Service</strong>.  
+    </p>
     <p>Created by <strong>Vivek</strong>, working at Cognizant Technology Solutions.</p>
-    <a href="#demo" class="button" id="explore-btn">Explore Demo</a>
+    <a href="#demo" class="button" id="explore-btn">Explore Full Workflow</a>
   </header>
 
   <div class="container" id="demo-section">
     <div class="card">
       <img src="/github_actions.jpg_large" alt="GitHub Actions">
-      <p>This image represents the CI?CD pipeline in action. It builds, tests, and packages your Java project automatically.</p>
+      <p><strong>GitHub Actions</strong> acts as the CI/CD engine. It triggers the pipeline on every code push or pull request, running all stages sequentially.</p>
+    </div>
+
+    <div class="card">
+      <img src="/maven.png" alt="Maven Build">
+      <p><strong>Maven</strong> compiles, tests, and packages the Java application into a JAR file. The build ensures all dependencies and unit tests pass before moving forward.</p>
     </div>
 
     <div class="card">
       <img src="/sonarcube.png" alt="SonarQube Analysis">
-      <p>SonarQube checks your code quality, ensuring that your project adheres to standards and avoids bugs.</p>
-    </div>
-
-    <div class="card">
-      <img src="/docker.png" alt="Docker Image" >
-      <p>Docker containerizes your application, making deployments consistent across environments.</p>
+      <p><strong>SonarQube</strong> performs static code analysis to check code quality, maintainability, and security vulnerabilities before deployment.</p>
     </div>
 
     <div class="card">
       <img src="/jfrog.png" alt="JFrog Artifactory">
-      <p>JFrog stores your build artifacts (JARs, images) safely with versioning, allowing rollback and traceability.</p>
+      <p><strong>JFrog Artifactory</strong> securely stores versioned build artifacts (JARs). This allows us to trace and pull the exact build we want for deployment.</p>
+    </div>
+
+    <div class="card">
+      <img src="/docker.png" alt="Docker Image">
+      <p><strong>Docker</strong> packages the JAR into a container image, ensuring consistent runtime across all environments. The image is pushed to Docker Hub.</p>
+    </div>
+
+    <div class="card">
+      <img src="/azure.jpg" alt="Azure Kubernetes Service">
+      <p><strong>Azure Kubernetes Service (AKS)</strong> pulls the Docker image and deploys it as a pod behind a LoadBalancer service, making the app accessible with scalability and reliability.</p>
     </div>
   </div>
 
   <footer>
-    &copy; 2025 Vivek | CI/CD Demo Project
+    &copy; 2025 Vivek | CI/CD Full Demo Project
   </footer>
 
   <script>
     const exploreBtn = document.getElementById('explore-btn');
     const demoSection = document.getElementById('demo-section');
-
     exploreBtn.addEventListener('click', (e) => {
       e.preventDefault();
       demoSection.classList.add('active');
