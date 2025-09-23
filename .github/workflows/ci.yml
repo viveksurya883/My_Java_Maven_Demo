@@ -101,4 +101,50 @@ jobs:
         run: docker build -t docker.io/${{ secrets.DOCKER_USERNAME }}/my_java_maven_demo:${{ github.sha }} .
 
       - name: Push Docker image
-        run: docker push docker.io/${{ secrets.DOCKER_USERNAME }}/my_java_maven_demo:${{ github.sha }}
+        id: push-image
+        run: |
+          IMAGE_NAME=docker.io/${{ secrets.DOCKER_USERNAME }}/my_java_maven_demo:${{ github.sha }}
+          docker push $IMAGE_NAME
+
+          DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' $IMAGE_NAME | awk -F'@' '{print $2}')
+          echo "digest=$DIGEST" >> $GITHUB_OUTPUT
+
+
+  deploy-to-aks:
+    runs-on: ubuntu-latest
+    needs: docker
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v4
+        with:
+          version: 'latest'
+
+      - name: Set AKS context
+        uses: azure/aks-set-context@v3
+        with:
+          resource-group: ${{ secrets.AZURE_RESOURCE_GROUP }}
+          cluster-name: ${{ secrets.AKS_CLUSTER_NAME }}
+
+      - name: Update deployment to new digest image
+        env:
+          IMAGE_DIGEST: ${{ needs.docker.outputs.digest }}
+        run: |
+          echo "Updating deployment to use image digest: $IMAGE_DIGEST"
+
+          # use the digest to set the exact image
+          kubectl set image deployment/my-java-demo my-java-demo=docker.io/${{ secrets.DOCKER_USERNAME }}/my_java_maven_demo@$IMAGE_DIGEST --record
+
+          # wait for rollout to finish
+          kubectl rollout status deployment/my-java-demo --timeout=180s
+
+          # optional: print pod logs for verification
+          POD=$(kubectl get pods -l app=my-java-demo -o jsonpath="{.items[0].metadata.name}")
+          kubectl logs $POD --tail=50 || true

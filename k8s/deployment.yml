@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-java-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: my-java-demo
+  template:
+    metadata:
+      labels:
+        app: my-java-demo
+    spec:
+      containers:
+        - name: my-java-demo
+          image: vivek883/my_java_maven_demo:latest
+          ports:
+            - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-java-demo-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: my-java-demo   # must match deployment label
+  ports:
+    - protocol: TCP
+      port: 80          # exposed externally
+      targetPort: 8080  # matches containerPort in deployment
