@@ -87,10 +87,13 @@ jobs:
             --interactive=false
           jf rt ping --server-id=my-artifactory
 
-      - name: Download JAR from maven-local (for Docker build)
+      - name: Download latest snapshot JAR from Artifactory
         run: |
           mkdir -p target
-          jf rt download "maven-local/com/example/my_java_maven_demo/0.0.1-SNAPSHOT/my_java_maven_demo-0.0.1-SNAPSHOT.jar" target/ --flat=true --server-id=my-artifactory
+          jf rt download --sort-by=created --limit=1 \
+            "maven-local/com/example/my_java_maven_demo/0.0.1-SNAPSHOT/my_java_maven_demo-0.0.1-*.jar" \
+            target/ --flat=true --server-id=my-artifactory
+          echo "Downloaded file:"
           ls -la target
 
       - name: Log in to Docker Hub
@@ -100,7 +103,10 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build Docker image
-        run: docker build -t docker.io/${{ secrets.DOCKER_USERNAME }}/my_java_maven_demo:${{ github.sha }} .
+        run: |
+          LATEST_JAR=$(ls target/my_java_maven_demo-*.jar | sort | tail -n1)
+          docker build -t docker.io/${{ secrets.DOCKER_USERNAME }}/my_java_maven_demo:${{ github.sha }} \
+            --build-arg JAR_FILE=$LATEST_JAR .
 
       - name: Push Docker image
         id: push-image
@@ -110,6 +116,7 @@ jobs:
 
           DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' $IMAGE_NAME | awk -F'@' '{print $2}')
           echo "digest=$DIGEST" >> $GITHUB_OUTPUT
+
 
 
   AKS-Deployment:
