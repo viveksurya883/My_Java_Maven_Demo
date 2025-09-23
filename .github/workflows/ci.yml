@@ -90,10 +90,11 @@ jobs:
       - name: Download latest snapshot JAR from Artifactory
         run: |
           mkdir -p target
-          jf rt download --sort-by=created --limit=1 \
+            # Sort by creation date descending, limit to 1 to get the latest build
+            jf rt download --sort-by=created --sort-order=desc --limit=1 \
             "maven-local/com/example/my_java_maven_demo/0.0.1-SNAPSHOT/my_java_maven_demo-0.0.1-*.jar" \
             target/ --flat=true --server-id=my-artifactory
-          echo "Downloaded file:"
+          echo "Downloaded latest JAR:"
           ls -la target
 
       - name: Log in to Docker Hub
@@ -104,7 +105,9 @@ jobs:
 
       - name: Build Docker image
         run: |
-          LATEST_JAR=$(ls target/my_java_maven_demo-*.jar | sort | tail -n1)
+          # Pick the single JAR in target/ (guaranteed latest from Artifactory)
+          LATEST_JAR=$(ls target/my_java_maven_demo-*.jar)
+          echo "Building Docker image with $LATEST_JAR"
           docker build -t docker.io/${{ secrets.DOCKER_USERNAME }}/my_java_maven_demo:${{ github.sha }} \
             --build-arg JAR_FILE=$LATEST_JAR .
 
@@ -116,7 +119,6 @@ jobs:
 
           DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' $IMAGE_NAME | awk -F'@' '{print $2}')
           echo "digest=$DIGEST" >> $GITHUB_OUTPUT
-
 
 
   AKS-Deployment:
