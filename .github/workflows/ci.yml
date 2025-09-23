@@ -65,6 +65,8 @@ jobs:
   docker:
     runs-on: ubuntu-latest
     needs: build-deploy
+    outputs:
+      digest: ${{ steps.push-image.outputs.digest }}
     steps:
       - name: Checkout (shallow)
         uses: actions/checkout@v4
@@ -140,7 +142,7 @@ jobs:
           echo "Updating deployment to use image digest: $IMAGE_DIGEST"
 
           # use the digest to set the exact image
-          kubectl set image deployment/my-java-demo my-java-demo=docker.io/${{ secrets.DOCKER_USERNAME }}/my_java_maven_demo@$IMAGE_DIGEST --record
+          kubectl set image deployment/my-java-demo my-java-demo=docker.io/${{ secrets.DOCKER_USERNAME }}/my_java_maven_demo@$IMAGE_DIGEST
 
           # wait for rollout to finish
           kubectl rollout status deployment/my-java-demo --timeout=180s
