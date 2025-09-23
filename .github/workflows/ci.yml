@@ -110,7 +110,7 @@ jobs:
           echo "digest=$DIGEST" >> $GITHUB_OUTPUT
 
 
-  deploy-to-aks:
+  AKS-Deployment:
     runs-on: ubuntu-latest
     needs: docker
     steps:
