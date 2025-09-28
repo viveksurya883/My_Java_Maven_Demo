@@ -1,0 +1,86 @@
+name: Auto-update base image digest (Docker Hub)
+
+on:
+  schedule:
+    - cron: '0 2 * * *'   # daily at 02:00 UTC (adjust as needed)
+  workflow_dispatch:
+
+jobs:
+  update-base:
+    runs-on: ubuntu-latest
+    env:
+      # Edit these if you use a different upstream image or tag:
+      REPO: library/eclipse-temurin   # Docker Hub repo (library/<image> for official images)
+      TAG: 17-jre-jammy               # tag you want to track
+      DOCKERFILE_PATH: Dockerfile     # path to your Dockerfile
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Get manifest digest from Docker Hub
+        id: get-digest
+        run: |
+          echo "Requesting token for ${REPO}..."
+          TOKEN=$(curl -s "https://auth.docker.io/token?service=registry.docker.io&scope=repository:${REPO}:pull" | jq -r .token)
+          if [ -z "$TOKEN" ] || [ "$TOKEN" = "null" ]; then
+            echo "Failed to get token" >&2
+            exit 1
+          fi
+          echo "Fetching manifest headers for ${REPO}:${TAG}..."
+          # Request manifest V2 header and read Docker-Content-Digest header
+          DIGEST=$(curl -sI -H "Accept: application/vnd.docker.distribution.manifest.v2+json" \
+            -H "Authorization: Bearer $TOKEN" \
+            "https://registry-1.docker.io/v2/${REPO}/manifests/${TAG}" \
+            | awk -F': ' '/Docker-Content-Digest/ {print $2}' | tr -d '\r')
+          if [ -z "$DIGEST" ]; then
+            echo "Failed to obtain manifest digest" >&2
+            exit 1
+          fi
+          echo "Latest digest: $DIGEST"
+          echo "digest=$DIGEST" >> $GITHUB_OUTPUT
+
+      - name: Show current FROM line
+        run: |
+          echo "Dockerfile (${DOCKERFILE_PATH}) FROM line:"
+          grep -i '^FROM' "${DOCKERFILE_PATH}" || true
+
+      - name: Update Dockerfile to use digest
+        id: update-file
+        run: |
+          DIGEST="${{ steps.get-digest.outputs.digest }}"
+          DF="${DOCKERFILE_PATH}"
+          if ! grep -qi 'eclipse-temurin' "$DF"; then
+            echo "No eclipse-temurin reference found in $DF; aborting."
+            exit 0
+          fi
+
+          # Build the new FROM line (use fully qualified name with digest)
+          NEW_FROM="FROM eclipse-temurin@${DIGEST}"
+
+          # Replace any FROM line that references eclipse-temurin with the digest line
+          # Works if FROM currently contains eclipse-temurin:tag or eclipse-temurin@sha256:...
+          sed -E -i.bak "s|^FROM[[:space:]]+.*eclipse-temurin[^[:space:]]*|${NEW_FROM}|" "$DF"
+
+          echo "Updated FROM to:"
+          grep -i '^FROM' "$DF" || true
+
+          # stage change (create branch will be created by create-pull-request action)
+          git add "$DF"
+
+      - name: Create Pull Request (if changes present)
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "chore(ci): update base image eclipse-temurin to ${{ steps.get-digest.outputs.digest }}"
+          branch: "auto/update-base-image-${{ steps.get-digest.outputs.digest }}"
+          title: "chore: bump base image eclipse-temurin to ${{ steps.get-digest.outputs.digest }}"
+          body: |
+            Automated update of base image to digest: ${{ steps.get-digest.outputs.digest }}
+
+            - Source: https://hub.docker.com/r/eclipse-temurin
+            - Tag: ${{ env.TAG }}
+            - Digest: ${{ steps.get-digest.outputs.digest }}
+          labels: auto-update, dependencies

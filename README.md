@@ -1,4 +1,112 @@
-last successful commit ci.yml: this uses github actions to upload the artifact and then downloads from the docker for image creation.
+CI/CD Pipeline Demo — Java Maven with AKS Deployment
+
+This project demonstrates a complete CI/CD workflow for a Java Maven application, showcasing industry-standard tools and best practices. The pipeline takes code from source to production automatically, ensuring quality, traceability, and scalability.
+📌 Workflow Overview
+1. Code Commit → GitHub Actions
+2. Maven Build
+3. SonarQube Quality Check
+4. Artifact Management (JFrog Artifactory)
+5. Dockerization
+6. Deployment on Azure Kubernetes Service (AKS)
+
+
+⚙️ Tools & Technologies
+
+- CI/CD → GitHub Actions
+- Build → Maven
+- Code Quality → SonarQube
+- Artifact Storage → JFrog Artifactory
+- Containerization → Docker
+- Deployment → Azure Kubernetes Service (AKS)
+
+
+🏗️ Pipeline Implementation
+
+1️⃣ Initialization
+mvn archetype:generate
+2️⃣ Build & Test
+mvn clean install
+Output → target/my_java_maven_demo-0.0.1-SNAPSHOT.jar
+3️⃣ Code Quality with SonarQube
+mvn sonar:sonar \
+  -Dsonar.projectKey=my-java-maven-demo \
+  -Dsonar.host.url=http://sonarqube:9000 \
+  -Dsonar.login=$SONAR_TOKEN
+4️⃣ Artifact Upload to JFrog
+jf rt upload target/*.jar maven-local/com/example/my_java_maven_demo/0.0.1-SNAPSHOT/
+5️⃣ Docker Build & Push
+docker build -t docker.io/<username>/my_java_maven_demo:<commit_sha> .
+docker push docker.io/<username>/my_java_maven_demo:<commit_sha>
+6️⃣ Kubernetes Deployment on AKS
+deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-java-maven-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: java-maven-demo
+  template:
+    metadata:
+      labels:
+        app: java-maven-demo
+    spec:
+      containers:
+      - name: java-maven-demo
+        image: docker.io/<username>/my_java_maven_demo:<commit_sha>
+        ports:
+        - containerPort: 8080
+service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: java-maven-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: java-maven-demo
+  ports:
+    - port: 80
+      targetPort: 8080
+      
+Deploy to AKS:
+kubectl apply -f deployment.yaml
+kubectl apply -f service.yaml
+
+
+🔎 Verification
+
+Check running pods:
+ kubectl get pods
+Check LoadBalancer service:
+ kubectl get svc java-maven-service
+Example output:
+NAME                 TYPE           CLUSTER-IP     EXTERNAL-IP      PORT(S)        AGE
+java-maven-service   LoadBalancer   10.0.123.45    52.176.xxx.xxx   80:32000/TCP   2m
+Visit → http://4.187.180.12/
+
+
+📊 CI/CD Workflow Diagram
+
+```mermaid
+flowchart LR
+    A[Developer Commit] --> B[GitHub Actions]
+    B --> C[Maven Build & Test]
+    C --> D[SonarQube Analysis]
+    D --> E[JFrog Artifactory (Store JAR)]
+    E --> F[Docker Build & Push to Docker Hub]
+    F --> G[Azure Kubernetes Service]
+    G --> H[Pods Running in AKS]
+    H --> I[LoadBalancer Service]
+    I --> J[User Access via Browser]
+```
+
+
+
+
+<!-- last successful commit ci.yml: this uses github actions to upload the artifact and then downloads from the docker for image creation.
 
 name: CI
 
@@ -158,7 +266,7 @@ jobs:
          --interactive=false
 
       - name: Upload artifact (JAR)
-        run: jf rt upload "target/*.jar" "maven-local/my_java_maven_demo/${{ github.run_number }}-${{ github.sha }}/" --flat=true --server-id=my-artifactory
+        run: jf rt upload "target/*.jar" "maven-local/my_java_maven_demo/${{ github.run_number }}-${{ github.sha }}/" --flat=true --server-id=my-artifactory -->
 
 
 
