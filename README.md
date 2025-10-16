@@ -103,6 +103,25 @@ flowchart LR
     I --> J[User Access via Browser]
 ```
 
+Build & Test
+
+Checks out code, sets up JDK, caches Maven, and creates Maven settings with JFrog credentials.
+Runs Maven build, SonarQube analysis, and deploys the JAR to JFrog Artifactory.
+Docker
+
+Installs and configures JFrog CLI.
+Downloads the latest JAR from JFrog Artifactory.
+Logs in to Docker Hub.
+Builds a Docker image using the downloaded JAR.
+Pushes the Docker image to Docker Hub and gets its digest.
+AKS Deployment
+
+Logs in to Azure, sets up kubectl, and sets AKS context.
+Updates the AKS deployment to use the new Docker image (by digest).
+Waits for rollout and prints pod logs for verification.
+Flow:
+Code → Build/Test/Quality → JAR to JFrog → JAR to Docker image → Image to Docker Hub → Deploy image to AKS.
+
 
 
 

@@ -1,18 +1,17 @@
 name: Auto-update base image digest (Docker Hub)
 
 on:
-  schedule:
-    - cron: '0 2 * * *'   # daily at 02:00 UTC (adjust as needed)
+  push:
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
   update-base:
     runs-on: ubuntu-latest
     env:
-      # Edit these if you use a different upstream image or tag:
       REPO: library/eclipse-temurin   # Docker Hub repo (library/<image> for official images)
-      TAG: 17-jre-jammy               # tag you want to track
-      DOCKERFILE_PATH: Dockerfile     # path to your Dockerfile
+      TAG: 17-jre-jammy               # tag 
+      DOCKERFILE_PATH: Dockerfile     # path to Dockerfile
     steps:
       - name: Checkout
         uses: actions/checkout@v4
